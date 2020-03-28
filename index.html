@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Hack Capstone</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header id="hero">
+        <nav>
+            <img src="https://via.placeholder.com/50/00881c/fff?text=ICON" alt="Cook-Along Icon" id="icon">
+            <h1>COOK•ALONG</h1>
+        </nav>
+    </header>
+
+    <form id="recipeForm">
+        <fieldset>
+            <h1>What Recipe do You Want?</h1>
+            <p>Browse videos to follow along with the preparation of specific recipes.</p>
+            <label for="foodName">Search</label>
+            <input type="text" id="foodName" name="foodName">
+
+            <input type="submit" id="search" name="search-button" value="Search" >
+            <button id="recent" name="recent-button">Recent</button>
+            <button id="browse" name="browse-button">Browse</button>
+        </fieldset>
+    </form>
+
+    <section class="hidden">
+        <ul id="results">
+
+        </ul>
+    </section>
+
+    <footer>
+        <h2>Share:</h2>
+        <img src="https://via.placeholder.com/50?text=f" alt="Facebook icon">
+        <img src="https://via.placeholder.com/50?text=f" alt="Facebook icon">
+        <img src="https://via.placeholder.com/50?text=f" alt="Facebook icon">
+        <img src="https://via.placeholder.com/50?text=f" alt="Facebook icon">
+    </footer>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
