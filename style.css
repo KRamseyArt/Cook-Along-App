@@ -135,18 +135,28 @@ fieldset label {
 }
 .dish-info{
     display: flex;
+    height: 150px;
 }
 .dish-img{
-    max-height: 250px;
     width: 25vw;
+    flex: 1;
     margin: 0;
+}
+.dish-links{
+    flex: 2;
+    height: 150px;
+}
+.dish-tags{
+    height: 80px;
+    padding: 20px;
 }
 .dish-tags li{
     display: inline;
     font-size: 24px;
 }
 
-.dish-info button{
+.view-btn{
+    
     padding: 10px;
     width: 150px;
     background: tomato;
@@ -168,8 +178,8 @@ fieldset label {
     margin: 10px;
     background: palegreen;
     border: 2px solid forestgreen;
-    border-radius: 25px;
-    padding: 10px;
+    border-radius: 50px;
+    padding: 5px 15px;
 }
 .instant-search:hover{
     background: forestgreen;
