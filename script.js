@@ -59,10 +59,11 @@ function addToMenu(arr){
 function manageInterface(){
     console.log("STORE values:");
     console.log(STORE);
-
+    loadHeaderImage()
+    
     setInterval(function() {
         loadHeaderImage()
-    }, 30000)
+    }, 5000)
 
     manageSearch();
     recentView();
@@ -272,16 +273,42 @@ function handleInstantSearch(){
 
 function handleVideoLoad(){
     $('.view-btn').click(function() {
+        $('#video-list').remove();
+        
+        const dishToAddVids = $(this).closest('.dish');
+        dishToAddVids.append(`
+            <section id="video-list">
+                <h4>Related Videos:</h4>
+                <ul id="related-vids">
+                </ul>
+            </section>
+        `)
 
-        let videoTag = $(this).closest('.dish').attr('id');
+        let videoTag = dishToAddVids.find('.dish-name').text();
+        videoTag = videoTag.split(' ').join('+');
         console.log(videoTag);
-
-        let videoID = STORE.fullMenu.filter(function(obj){
-            return obj.idMeal === videoTag;
-        })
-        console.log(videoID);
+        
+        fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=How+to+Make+${videoTag}&maxResults=2&key=${STORE.yt_key}`)
+        .then(response => response.json())
+        .then(responseJSON => appendVideo(responseJSON));
         
     })
+    function appendVideo(arr){
+        console.log(arr);
+        arr.items.map(video =>{
+            console.log(video)
+            console.log(video.id.videoId)
+            $(`#related-vids`).append(`
+            <li class="video">
+                <iframe 
+                    src="https://www.youtube.com/embed/${video.id.videoId}"
+                    frameborder="0"
+                    allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture">
+                </iframe>
+            </li>
+            `)
+        })
+    }
     
     /*
     fetch(`https://www.googleapis.com/youtube/v3?key=${STORE.yt_key}`)
@@ -575,6 +602,75 @@ function appendVideo(obj){
         })
     })
 }
+
+
+
+
+
+
+function displaySearchResults(arr){
+    $('#results').empty();
+    
+    let index = 0;
+
+    console.log(arr);
+    arr.meals.map(meal=>{
+        // console.log(`ID: ${meal.idMeal}- ${meal.strMeal}`);
+        const fullDishDetails = getMealByID(meal.idMeal);
+    })
+    
+    if (arr.meals){
+        arr.meals.map(meal =>{
+            let tags = "";
+
+            if (meal.strCategory){
+                tags += `<li class="instant-search" data-type="category" data-value="${meal.strCategory}">${meal.strCategory}</li>`;
+            }
+            if (meal.strArea){
+                tags += `<li class="instant-search" data-type="area" data-value="${meal.strArea}">${meal.strArea}</li>`;
+            }
+            
+            $('#results').append(`
+                <li class="dish">
+                    <h3 class="dish-name">${meal.strMeal.toUpperCase()}</h3>
+                    <section class="dish-info">
+                        <img src="${meal.strMealThumb}" alt="Image of ${meal.strMeal}" class="dish-img"/>
+                        <section class="dish-links">
+                            <ul class="dish-tags">
+                                ${tags}
+                            </ul>
+                            <button class="view-btn">...View Videos</button>
+                        </section>
+                    </section>
+                </li>
+            `)
+            handleInstantSearch();
+
+            const string = meal.strMeal.split(' ').join('+');
+            
+
+
+
+            fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=How+to+Make+${string}&maxResults=6&key=${STORE.yt_key}`)
+            .then(response => response.json())
+            .then(responseJSON => appendVideo(responseJSON, string, index));
+            
+
+
+
+            // console.log(index);
+            index++;
+        });
+    } else {
+        $('#results').append(`
+                <li id="unavailable">
+                    Sorry, there are no options to display... Try another search term.
+                </li>
+            `)
+    }
+    // clear search bar value for next entry
+    $('#foodName').val('');
+
+    $('.hidden').removeClass('hidden');
+}
 */
-
-
