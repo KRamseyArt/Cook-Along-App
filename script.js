@@ -176,6 +176,14 @@ function findMatchingResults(str){
         const checkDishName = dish.strMeal.toLowerCase().split(' ').join('');
         const checkDishCategory = dish.strCategory.toLowerCase().split(' ').join('');
         const checkDishArea = dish.strArea.toLowerCase().split(' ').join('');
+        const checkDishTags = dish.strTags ? dish.strTags.toLowerCase().split(',').join('') : null;
+        // console.log(checkDishTags);
+
+        let dishIngredients = [];
+
+        for (let i = 1; i <= 20; i++){
+            dishIngredients.push(dish[`strIngredient${i}`]);
+        }
 
         if (checkDishName.includes(checkStr)){
             if(!matchingResults.includes(dish.idMeal)){
@@ -191,6 +199,18 @@ function findMatchingResults(str){
             if(!matchingResults.includes(dish.idMeal)){
                 // console.log(`Found unique Area with ${checkStr} - add to list: ${dish.idMeal} - ${dish.strMeal}`);
                 matchingResults.push(dish.idMeal);
+            }
+        } else if (dishIngredients.includes(checkStr)){
+            if(!matchingResults.includes(dish.idMeal)){
+                // console.log(`Found unique Ingredient with ${checkStr} - add to list: ${dish.idMeal} - ${dish.strMeal}`);
+                matchingResults.push(dish.idMeal);
+            }
+        } else if (checkDishTags){
+            if (checkDishTags.includes(checkStr)){
+                if(!matchingResults.includes(dish.idMeal)){
+                    // console.log(`Found unique Tags with ${checkStr} - add to list: ${dish.idMeal} - ${dish.strMeal}`);
+                    matchingResults.push(dish.idMeal);
+                }
             }
         }
     })
