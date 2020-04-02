@@ -1,19 +1,260 @@
 const STORE= {
     meal_key: 1,
     yt_key: "AIzaSyCFnYmhhtGkOdkgU-xnlDxB4fbTcyam03w",
-    headerImg: "https://via.placeholder.com/1920x1080?text=JSImage",
-    previousSearches: [],
+    headerImg: 0,
+    recentList: [],
     browseList: [],
-    term: "",
-    termType: ""
+    fullMenu: []
 }
 
-function manageInput(){
-    manageKeywordSearch();
-    manageRecentSearch();
-    manageBrowse();
+function getCooking(){
+    createMenu();
+    setTimeout(function(){
+        manageInterface();
+    }, 5000)
+    
+}
+//----------------BUILD MENU--------------------
+function createMenu(){
+    // Add categories to Browse list
+    fetch(`https://www.themealdb.com/api/json/v1/${STORE.meal_key}/list.php?c=list`)
+    .then(response => response.json())
+    .then(responseJSON => addToBrowseList(responseJSON));
+    // Add Areas to Browse List
+    fetch(`https://www.themealdb.com/api/json/v1/${STORE.meal_key}/list.php?a=list`)
+    .then(response => response.json())
+    .then(responseJSON => addToBrowseList(responseJSON));
+}
+function addToBrowseList(arr){
+    arr.meals.map(meal =>{
+        // Browse list done
+        STORE.browseList.push(meal);
+    })
+    //Begin constructing complete full menu based on browse list results
+    searchForIDs(STORE.browseList);
+}
+function searchForIDs(arr){
+    // iterate through browse list filtered for ONLY area, to return meal objects with ID values
+    arr.map(filter =>{
+        if(filter.strArea){
+            fetch(`https://www.themealdb.com/api/json/v1/${STORE.meal_key}/filter.php?a=${filter.strArea}`)
+            .then(response => response.json())
+            .then(responseJSON => queueMenu(responseJSON));
+        }
+    });
+}
+function queueMenu(arr){
+    // Get dish info based on query filtered by ID values
+    arr.meals.map(meal =>{
+        fetch(`https://www.themealdb.com/api/json/v1/${STORE.meal_key}/lookup.php?i=${meal.idMeal}`)
+        .then(response => response.json())
+        .then(responseJSON => addToMenu(responseJSON))
+    })
+}
+function addToMenu(arr){
+    // Add dishes to menu based on each unique ID value
+    STORE.fullMenu.push(arr.meals[0]);
 }
 
+function manageInterface(){
+    console.log("STORE values:");
+    console.log(STORE);
+
+    setInterval(function() {
+        loadHeaderImage()
+    }, 5000)
+
+    manageSearch();
+    recentView();
+    browseView();
+}
+
+//----------------SEARCH MANAGERS--------------------
+function manageSearch(){
+    $('#searchForm').submit(e =>{
+        e.preventDefault();
+
+        $('#results').empty();
+
+        let searchValue = e.target.foodName.value;
+
+        if (!searchValue){
+            displayRandomDish();
+        } else {
+            addToRecentList(searchValue);
+            findMatchingResults(searchValue);
+        }
+        $('#foodName').val('');
+    })
+}
+
+function recentView(){
+    $('#recent').click(e =>{
+        e.preventDefault();
+        displayRecentList();
+    })
+}
+
+function browseView(){
+    $('#browse').click(e =>{
+        e.preventDefault();
+        displayBrowseList();
+    })
+}
+
+function loadHeaderImage(){
+    let randomIndex = Math.floor(Math.random() * STORE.fullMenu.length-1);
+    console.log(STORE.fullMenu[randomIndex].strMealThumb);
+    $('#hero').css('background-image',`url(${STORE.fullMenu[randomIndex].strMealThumb})`)
+}
+//----------------DISPLAY MANAGERS--------------------
+function addToRecentList(str){
+    if(!STORE.recentList.includes(str)){
+        STORE.recentList.push(str);
+        STORE.recentList.sort();
+    }
+}
+function displayRecentList(){
+    $('#results').empty();
+    STORE.recentList.map(entry =>{
+        $('#results').append(`
+            <li class="instant-search">${entry}</li>
+        `)
+    })
+    handleInstantSearch();
+    $('.hidden').removeClass();
+}
+function displayBrowseList(){
+    $('#results').empty();
+    STORE.browseList.map(entry =>{
+        if (entry.strArea){
+            $('#results').append(`
+                <li class="instant-search area">${entry.strArea}</li>
+            `);
+        } else if (entry.strCategory){
+            $('#results').append(`
+                <li class="instant-search category">${entry.strCategory}</li>
+            `);
+        }
+    })
+    handleInstantSearch();
+    $('.hidden').removeClass();
+}
+
+function displayRandomDish(){
+    // console.log('Please enter a value in the search field');
+    const index = Math.floor(Math.random() * STORE.fullMenu.length);
+    const sampleMeal = STORE.fullMenu[index];
+    // console.log(sampleMeal);
+    
+    $('#results').append(`
+    <li class="dish">
+    <h3 class="dish-name">${sampleMeal.strMeal.toUpperCase()}</h3>
+    <section class="dish-info">
+        <img src="${sampleMeal.strMealThumb}" alt="Image of ${sampleMeal.strMeal}" class="dish-img"/>
+        <section class="dish-links">
+        <h4>Search Similar:</h4>
+            <ul class="dish-tags">
+                <li class="instant-search category">${sampleMeal.strCategory}</li>
+                <li class="instant-search area">${sampleMeal.strArea}</li>
+            </ul>
+            <button class="view-btn">Prep Videos</button>
+        </section>
+    </section>
+</li>
+<li id="unavailable">
+    If you don't enter a specific search term, you'll get a random recipe!
+</li>
+    `);
+    handleInstantSearch();
+    $('.hidden').removeClass();
+}
+
+function findMatchingResults(str){
+    const checkStr = str.toLowerCase().split(' ').join('+');
+    const matchingResults = [];
+
+    STORE.fullMenu.map(dish =>{
+        const checkDishName = dish.strMeal.toLowerCase().split(' ').join('');
+        const checkDishCategory = dish.strCategory.toLowerCase().split(' ').join('');
+        const checkDishArea = dish.strArea.toLowerCase().split(' ').join('');
+        
+        if (checkDishName.includes(checkStr)){
+            console.log(`Found dish name with ${checkStr}`);
+            if(!matchingResults.includes(dish.idMeal)){
+                console.log(`${checkStr} is a unique entry - add to list`);
+                matchingResults.push(dish.idMeal);
+            }
+        } else if (checkDishCategory.includes(checkStr)){
+            console.log(`Found dish category with ${checkStr}`);
+            if(!matchingResults.includes(dish.idMeal)){
+                console.log(`${checkStr} is a unique entry - add to list`);
+                matchingResults.push(dish.idMeal);
+            }
+        } else if (checkDishArea.includes(checkStr)){
+            console.log(`Found dish area with ${checkStr}`);
+            if(!matchingResults.includes(dish.idMeal)){
+                console.log(`${checkStr} is a unique entry - add to list`);
+                matchingResults.push(dish.idMeal);
+            }
+        }
+    })
+
+    displayMatchingResults(matchingResults);
+}
+function displayMatchingResults(arr){
+    const fullMenu = STORE.fullMenu;
+    console.log(`display matching results of:`);
+    console.log(arr);
+    
+    let relevantDishes = [];
+
+    arr.map(id =>{
+        console.log(id);
+        const dishWithMatchingID = fullMenu.filter(function(obj){
+            return obj.idMeal === id;
+        })
+        // console.log(dishWithMatchingID);
+        relevantDishes.push(dishWithMatchingID);
+    })
+    console.log('relevant Dishes: ');
+    console.log(relevantDishes);
+    
+    
+    relevantDishes.forEach(dish =>{
+        
+        $('#results').append(`
+            <li class="dish">
+            <h3 class="dish-name">${dish.strMeal}</h3>
+            <section class="dish-info">
+                <img src="${dish.strMealThumb}" alt="Image of ${dish.strMeal}" class="dish-img"/>
+                <section class="dish-links">
+                    <h4>Search Similar:</h4>
+                    <ul class="dish-tags">
+                        <li class="instant-search category">${dish.strCategory}</li>
+                        <li class="instant-search area">${dish.strArea}</li>
+                    </ul>
+                    <button class="view-btn">Prep Videos</button>
+                </section>
+            </section>
+        </li>
+        `)
+
+    })
+}
+
+function handleInstantSearch(){
+    $('.instant-search').click(function(){
+        const searchVal = $(this).text();
+        console.log(searchVal);
+
+        $('#foodName').val(searchVal);
+        $('#searchForm').submit();
+    })
+}
+//----------------INITIALIZE--------------------
+$(getCooking);
+/* OLD CODE
 // -----------------------------------------SEARCH TYPE MANAGERS-------------------------------------//
 // on form input submission, check for searchbar value and make search accordingly
 function manageKeywordSearch(){
@@ -123,7 +364,7 @@ function displaySearchResults(arr){
         // console.log(`ID: ${meal.idMeal}- ${meal.strMeal}`);
         const fullDishDetails = getMealByID(meal.idMeal);
     })
-    
+
     if (arr.meals){
         arr.meals.map(meal =>{
             let tags = "";
@@ -153,11 +394,6 @@ function displaySearchResults(arr){
 
             const string = meal.strMeal.split(' ').join('+');
 
-            /*
-            fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=How+to+Make+${string}&maxResults=6&key=${STORE.yt_key}`)
-            .then(response => response.json())
-            .then(responseJSON => appendVideo(responseJSON, string, index));
-            */
             // console.log(index);
             index++;
         });
@@ -302,7 +538,6 @@ function appendVideo(obj){
         })
     })
 }
+*/
 
 
-
-$(manageInput);
