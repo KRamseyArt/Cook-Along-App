@@ -62,7 +62,7 @@ function manageInterface(){
 
     setInterval(function() {
         loadHeaderImage()
-    }, 5000)
+    }, 30000)
 
     manageSearch();
     recentView();
@@ -81,10 +81,10 @@ function manageSearch(){
         if (!searchValue){
             displayRandomDish();
         } else {
+            $('#foodName').val('');
             addToRecentList(searchValue);
             findMatchingResults(searchValue);
         }
-        $('#foodName').val('');
     })
 }
 
@@ -142,59 +142,36 @@ function displayBrowseList(){
 }
 
 function displayRandomDish(){
-    // console.log('Please enter a value in the search field');
     const index = Math.floor(Math.random() * STORE.fullMenu.length);
     const sampleMeal = STORE.fullMenu[index];
-    // console.log(sampleMeal);
-    
-    $('#results').append(`
-    <li class="dish">
-    <h3 class="dish-name">${sampleMeal.strMeal.toUpperCase()}</h3>
-    <section class="dish-info">
-        <img src="${sampleMeal.strMealThumb}" alt="Image of ${sampleMeal.strMeal}" class="dish-img"/>
-        <section class="dish-links">
-        <h4>Search Similar:</h4>
-            <ul class="dish-tags">
-                <li class="instant-search category">${sampleMeal.strCategory}</li>
-                <li class="instant-search area">${sampleMeal.strArea}</li>
-            </ul>
-            <button class="view-btn">Prep Videos</button>
-        </section>
-    </section>
-</li>
-<li id="unavailable">
-    If you don't enter a specific search term, you'll get a random recipe!
-</li>
-    `);
-    handleInstantSearch();
-    $('.hidden').removeClass();
+
+    loadDishes(sample =[[sampleMeal]]);
 }
 
 function findMatchingResults(str){
     const checkStr = str.toLowerCase().split(' ').join('+');
     const matchingResults = [];
 
+    console.log(`Searching ${checkStr}:`)
+
     STORE.fullMenu.map(dish =>{
         const checkDishName = dish.strMeal.toLowerCase().split(' ').join('');
         const checkDishCategory = dish.strCategory.toLowerCase().split(' ').join('');
         const checkDishArea = dish.strArea.toLowerCase().split(' ').join('');
-        
+
         if (checkDishName.includes(checkStr)){
-            console.log(`Found dish name with ${checkStr}`);
             if(!matchingResults.includes(dish.idMeal)){
-                console.log(`${checkStr} is a unique entry - add to list`);
+                console.log(`Found unique Name with ${checkStr} - add to list: ${dish.idMeal} - ${dish.strMeal}`);
                 matchingResults.push(dish.idMeal);
-            }
+            }   
         } else if (checkDishCategory.includes(checkStr)){
-            console.log(`Found dish category with ${checkStr}`);
             if(!matchingResults.includes(dish.idMeal)){
-                console.log(`${checkStr} is a unique entry - add to list`);
+                console.log(`Found unique Category with ${checkStr} - add to list: ${dish.idMeal} - ${dish.strMeal}`);
                 matchingResults.push(dish.idMeal);
             }
         } else if (checkDishArea.includes(checkStr)){
-            console.log(`Found dish area with ${checkStr}`);
             if(!matchingResults.includes(dish.idMeal)){
-                console.log(`${checkStr} is a unique entry - add to list`);
+                console.log(`Found unique Area with ${checkStr} - add to list: ${dish.idMeal} - ${dish.strMeal}`);
                 matchingResults.push(dish.idMeal);
             }
         }
@@ -202,8 +179,8 @@ function findMatchingResults(str){
 
     displayMatchingResults(matchingResults);
 }
+
 function displayMatchingResults(arr){
-    const fullMenu = STORE.fullMenu;
     console.log(`display matching results of:`);
     console.log(arr);
     
@@ -211,42 +188,55 @@ function displayMatchingResults(arr){
 
     arr.map(id =>{
         console.log(id);
-        const dishWithMatchingID = fullMenu.filter(function(obj){
+        const dishWithMatchingID = STORE.fullMenu.filter(function(obj){
             return obj.idMeal === id;
         })
         // console.log(dishWithMatchingID);
         relevantDishes.push(dishWithMatchingID);
     })
-    console.log('relevant Dishes: ');
-    console.log(relevantDishes);
     
-    
-    relevantDishes.forEach(dish =>{
-        
+    loadDishes(relevantDishes, relevantDishes.length);
+}
+
+function loadDishes(dishes, count = 0){
+    console.log('Relevant Dishes: ');
+    console.log(dishes);
+
+    dishes.map(dish =>{
+        console.log(dish[0]);
         $('#results').append(`
-            <li class="dish">
-            <h3 class="dish-name">${dish.strMeal}</h3>
+        <li class="dish">
+            <h3 class="dish-name">${dish[0].strMeal.toUpperCase()}</h3>
             <section class="dish-info">
-                <img src="${dish.strMealThumb}" alt="Image of ${dish.strMeal}" class="dish-img"/>
+                <img src="${dish[0].strMealThumb}" alt="Image of ${dish[0].strMeal}" class="dish-img"/>
                 <section class="dish-links">
-                    <h4>Search Similar:</h4>
+                <h4>Search Similar:</h4>
                     <ul class="dish-tags">
-                        <li class="instant-search category">${dish.strCategory}</li>
-                        <li class="instant-search area">${dish.strArea}</li>
+                        <li class="instant-search category">${dish[0].strCategory}</li>
+                        <li class="instant-search area">${dish[0].strArea}</li>
                     </ul>
                     <button class="view-btn">Prep Videos</button>
                 </section>
             </section>
         </li>
-        `)
-
+    `);
     })
+
+    if (count === 0){
+        $('.dish').after(`
+        <li id="unavailable">
+            If you don't enter a specific search term, you'll get a random recipe!
+        </li>
+        `);
+    }
+        
+    handleInstantSearch();
+    $('.hidden').removeClass();
 }
 
 function handleInstantSearch(){
     $('.instant-search').click(function(){
         const searchVal = $(this).text();
-        console.log(searchVal);
 
         $('#foodName').val(searchVal);
         $('#searchForm').submit();
