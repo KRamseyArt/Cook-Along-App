@@ -9,21 +9,31 @@ const STORE= {
 
 function getCooking(){
     createMenu();
-    setTimeout(function(){
-        manageInterface();
-    }, 5000)
+    // setTimeout(function(){
+    //     manageInterface();
+    // }, 5000)
+    //manageInterface();
     
+    manageSearch();
+    recentView();
+    browseView();
 }
 //----------------BUILD MENU--------------------
 function createMenu(){
     // Add categories to Browse list
     fetch(`https://www.themealdb.com/api/json/v1/${STORE.meal_key}/list.php?c=list`)
     .then(response => response.json())
-    .then(responseJSON => addToBrowseList(responseJSON));
+    .then(responseJSON => {
+        addToBrowseList(responseJSON);
+        return fetch(`https://www.themealdb.com/api/json/v1/${STORE.meal_key}/list.php?a=list`);
+    })
+        
     // Add Areas to Browse List
-    fetch(`https://www.themealdb.com/api/json/v1/${STORE.meal_key}/list.php?a=list`)
+    //fetch(`https://www.themealdb.com/api/json/v1/${STORE.meal_key}/list.php?a=list`)
     .then(response => response.json())
-    .then(responseJSON => addToBrowseList(responseJSON));
+    .then(responseJSON => {
+        addToBrowseList(responseJSON);
+    })
 }
 function addToBrowseList(arr){
     arr.meals.map(meal =>{
@@ -45,15 +55,19 @@ function searchForIDs(arr){
 }
 function queueMenu(arr){
     // Get dish info based on query filtered by ID values
-    arr.meals.map(meal =>{
-        fetch(`https://www.themealdb.com/api/json/v1/${STORE.meal_key}/lookup.php?i=${meal.idMeal}`)
+    const promises = arr.meals.map(meal =>{
+        return fetch(`https://www.themealdb.com/api/json/v1/${STORE.meal_key}/lookup.php?i=${meal.idMeal}`)
         .then(response => response.json())
         .then(responseJSON => addToMenu(responseJSON))
     })
+    Promise.all(promises).then(data => {
+        manageInterface();
+    });
 }
 function addToMenu(arr){
     // Add dishes to menu based on each unique ID value
     STORE.fullMenu.push(arr.meals[0]);
+    
 }
 
 function manageInterface(){
@@ -65,9 +79,6 @@ function manageInterface(){
         loadHeaderImage()
     }, 5000)
 
-    manageSearch();
-    recentView();
-    browseView();
 }
 
 //----------------SEARCH MANAGERS--------------------
