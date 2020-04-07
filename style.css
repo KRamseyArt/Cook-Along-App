@@ -59,7 +59,7 @@ nav {
     border-bottom: 2px solid forestgreen;
     margin: 0 auto;
 }
-#searchForm fieldset{
+#searchField{
     width: 100%;
     border: none;
     padding:0 0 5px 0;
@@ -69,7 +69,7 @@ nav {
     width: 100%;
     padding: 10px;
 }
-fieldset label {
+#searchField label {
     color: black;
     padding: 0 10px;
 }
@@ -94,13 +94,12 @@ fieldset label {
 #search:hover {
     background: lightsalmon;
 }
-#non-search{
-    display: flex;
-}
 #non-search {
     width: 90%;
     display: flex;
     justify-content: space-between;
+    flex-direction: row;
+    border: none;
 }
 #non-search button{
     flex: 1;
@@ -139,7 +138,7 @@ fieldset label {
 }
 .dish {
     border-bottom: 2px solid forestgreen;
-    /* width: 100%; */
+    background: white;
 }
 
 .dish-name{
@@ -199,9 +198,10 @@ fieldset label {
     width: 280px;
 }
 .instant-search{
-    width: 150px;
+    max-width: 250px;
     color: black;
     margin: 10px auto;
+    white-space: nowrap;
     background: palegreen;
     border: 2px solid forestgreen;
     border-radius: 50px;
@@ -217,6 +217,73 @@ fieldset label {
     margin-left: 0;
 }
 
+
+.tooltip {
+    background: tomato;
+    color: wheat;
+    width: 100%;
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 90%;
+    background: lightsalmon;
+    color: black;
+    border: 2px solid tomato;
+    text-align: center;
+    padding: 5px;
+    border-radius: 6px;
+
+    /* Position the tooltip text */
+    position: absolute;
+    z-index: 1;
+    top: 120%;
+    left: 55%;
+    margin-left: -50%;
+
+    /* Fade in tooltip */
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+  /* Tooltip arrow */
+.tooltip .tooltiptext::before {
+    content: "";
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent lightsalmon transparent;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
+
+#ingredients-list{
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+}
+#ingredients-list li{
+    margin: 2px 10px;
+    background: palegreen;
+    width: 200px;
+    flex: 1;
+    white-space: nowrap;
+    /* overflow: hidden; */
+}
+
+#ingredients-list li:hover{
+    background: forestgreen;
+}
+
 #video-list{
     background: tomato;
     color: wheat;
@@ -225,14 +292,18 @@ fieldset label {
     width: 100%;
 }
 #related-vids{
-    /* padding: 0; */
-    /* width: 100%; */
-    /* display: flex; */
+    padding: 0;
+    width: 100%;
+    /* border: 2px solid black; */
+    display: flex;
+    flex-wrap: wrap;
+    /* justify-content: left; */
 }
 .video{
-    /* flex: 1; */
-    /* max-width: 45%; */
-    /* margin: 5px auto; */
+    list-style-type: none;
+    flex: 1;
+    /* max-width: 100px; */
+    margin: 5px 0;
 }
 
 footer {
@@ -246,4 +317,20 @@ footer {
 .social-icon {
     margin: 5px 5px 0 5px;
     border-radius: 100%;
+}
+
+@media only screen and (min-width: 840px){    
+    .dish{
+        width: 720px;
+    }
+    #searchForm fieldset {
+        width: 720px;
+    }
+    #formHeader {
+        background-image: linear-gradient(to left, wheat, forestgreen, forestgreen, forestgreen, forestgreen, wheat);
+    }
+    #results {
+        background: 
+    }
+    
 }

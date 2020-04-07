@@ -15,18 +15,18 @@
     </header>
 
     <form id="searchForm">
-        <fieldset>
-            <section id="formHeader">
+        <fieldset id="searchField">
+            <div id="formHeader">
                 <h2>WHAT RECIPE DO YOU WANT?</h2>
-            </section>
+            </div>
             <label for="foodName">Input a term to browse instructional videos, and follow along with the preparation of specific recipes.</label>
-            <input type="text" id="foodName" name="foodName">
+            <input type="text" id="foodName" name="foodName" placeholder="ex: Beef">
 
             <input type="submit" id="search" name="search-button" value="Search" >
-            <section id="non-search">
+            <div id="non-search">
                 <button id="recent" name="recent-button">Recent</button>
                 <button id="browse" name="browse-button">Browse</button>
-            </section>
+            </div>
             
         </fieldset>
     </form>
