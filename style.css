@@ -8,8 +8,10 @@
 }
 body {
     position: relative;
-    padding-bottom: 100px;
+    /* padding-bottom: 100px; */
     min-height: 100vh;
+    max-width: 100vw;
+    background: lightsalmon;
 }
 h1, h2{
     font-family: 'Poiret One', Arial, Helvetica, sans-serif;
@@ -27,12 +29,7 @@ nav {
     color: white;
     display: flex;
 }
-#icon {
-    position: absolute;
-    margin-left: 0px;
-}
 #appName {
-    margin-right: 10px;
     align-self: center;
     justify-self: right;
 }
@@ -130,15 +127,18 @@ nav {
 #results li{
     list-style-type: none;
 }
-#unavailable{
-    color: tomato;
-    margin: 10% auto;
-    padding: 20px;
+#subheader{
+    background: tomato;
+    /* margin: 10px auto; */
+    padding: 10px;
     font-weight: bold;
 }
 .dish {
     border-bottom: 2px solid forestgreen;
     background: white;
+}
+.dish:nth-last-child(1){
+    border-bottom: none;
 }
 
 .dish-name{
@@ -179,7 +179,7 @@ nav {
     margin: 3px auto;
 }
 
-.view-btn{
+.view-btn, .hide-btn{
     margin-top: 5px;
     padding: 10px;
     width: 150px;
@@ -329,8 +329,4 @@ footer {
     #formHeader {
         background-image: linear-gradient(to left, wheat, forestgreen, forestgreen, forestgreen, forestgreen, wheat);
     }
-    #results {
-        background: 
-    }
-    
 }

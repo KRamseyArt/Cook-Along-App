@@ -1,4 +1,5 @@
 const STORE= {
+    // retains key data for future use
     meal_key: 1,
     yt_key: "AIzaSyCFnYmhhtGkOdkgU-xnlDxB4fbTcyam03w",
     headerImg: 0,
@@ -9,21 +10,14 @@ const STORE= {
 
 function getCooking(){
     createMenu();
-    console.log(STORE);
-    // setTimeout(function(){
-    //     manageInterface();
-    // }, 5000)
-    //manageInterface();
     
     manageSearch();
     recentView();
     browseView();
-
-    resChecker();
 }
 //----------------BUILD MENU--------------------
 function createMenu(){
-    // Add categories to Browse list
+    // Create Browse list by pulling all entries from APIs Area and Category lists
     fetch(`https://www.themealdb.com/api/json/v1/${STORE.meal_key}/list.php?c=list`)
     .then(response => response.json())
     .then(responseJSON => {
@@ -42,12 +36,14 @@ function addToBrowseList(arr){
         // Browse list done
         STORE.browseList.push(meal);
     })
-    //Begin constructing complete full menu based on browse list results
+    //Use Browse list entries as foundation for finding all meal data
     searchForIDs(STORE.browseList);
 }
 function searchForIDs(arr){
     // iterate through browse list filtered for ONLY area, to return meal objects with ID values
     arr.map(filter =>{
+        // filter Browse List for only Objects with Area categories, to ensure not to populate duplicate dish objects
+        // Returns objects with strMeal, strMealThumb, and idMeal properties
         if(filter.strArea){
             fetch(`https://www.themealdb.com/api/json/v1/${STORE.meal_key}/filter.php?a=${filter.strArea}`)
             .then(response => response.json())
@@ -56,33 +52,35 @@ function searchForIDs(arr){
     });
 }
 function queueMenu(arr){
-    // Get dish info based on query filtered by ID values
+    // Search for complete dish data by idMeal value, and populate full menu with objects containing complete meal data
     const promises = arr.meals.map(meal =>{
         return fetch(`https://www.themealdb.com/api/json/v1/${STORE.meal_key}/lookup.php?i=${meal.idMeal}`)
         .then(response => response.json())
         .then(responseJSON => addToMenu(responseJSON))
     })
     Promise.all(promises).then(data => {
+        // Once complete menu is populated, enable main interface functionality
         manageInterface();
     });
 }
 function addToMenu(arr){
-    // Add dishes to menu based on each unique ID value
+    // Add complete dish to stored fullMenu array
     STORE.fullMenu.push(arr.meals[0]);
     
 }
 
 function manageInterface(){
+    // allows new header image to populate every 5 seconds
     loadHeaderImage()
     
     setInterval(function() {
         loadHeaderImage()
     }, 5000)
-
 }
 
 //----------------SEARCH MANAGERS--------------------
 function manageSearch(){
+    // handles all search functionality
     $('#searchForm').submit(e =>{
         e.preventDefault();
 
@@ -93,14 +91,15 @@ function manageSearch(){
         if (!searchValue){
             displayRandomDish();
         } else {
-            $('#foodName').val('');
             addToRecentList(searchValue);
             findMatchingResults(searchValue);
+            $('#foodName').val('');
         }
     })
 }
 
 function recentView(){
+    // Display stored Recent List values when 'recent' button clicked
     $('#recent').click(e =>{
         e.preventDefault();
         displayRecentList();
@@ -108,6 +107,7 @@ function recentView(){
 }
 
 function browseView(){
+    //Display full stored Browse Menu completed at page load
     $('#browse').click(e =>{
         e.preventDefault();
         displayBrowseList();
@@ -115,25 +115,29 @@ function browseView(){
 }
 
 function loadHeaderImage(){
+    // Get image from a randomly selected dish object in the stored fullMenu array
     let randomIndex = Math.floor(Math.random() * STORE.fullMenu.length);
     $('#hero').css('background-image',`url(${STORE.fullMenu[randomIndex].strMealThumb})`)
 }
 //----------------DISPLAY MANAGERS--------------------
 function addToRecentList(str){
+    // when a search term is input, add to the stored RecentList array
     if(!STORE.recentList.includes(str)){
         STORE.recentList.push(str);
         STORE.recentList.sort();
     }
 }
 function displayRecentList(){
-    
+    // Show user recently searched terms
+    $('#results').empty();
+
     if (STORE.recentList.length === 0){
-        $('#results').empty().append(`
-            <h4 id="unavailable">You have not made any recent search inquiries... Please enter a value into the search bar above, or select a category from our Browse menu!</h4>
+        $('#results').append(`
+            <h4 id="subheader">You have not made any recent search inquiries... Please enter a value into the search bar above, or select a category from our Browse menu!</h4>
         `);
     } else {
-        $('#results').empty().append(`
-            <h4>Recent Searches:</h4>
+        $('#results').append(`
+            <h4 id="subheader">Recent Searches:</h4>
         `);
         STORE.recentList.map(entry =>{
             $('#results').append(`
@@ -145,9 +149,11 @@ function displayRecentList(){
     
     $('.hidden').removeClass();
 }
+
 function displayBrowseList(){
+    //Show user complete Browse List
     $('#results').empty().append(`
-        <h4>Browse Categories:</h4>
+        <h4 id="subheader">Browse Categories:</h4>
     `);
     STORE.browseList.map(entry =>{
         if (entry.strArea){
@@ -165,6 +171,7 @@ function displayBrowseList(){
 }
 
 function displayRandomDish(){
+    // when no search input, display a randomly selected dish from the full menu
     const index = Math.floor(Math.random() * STORE.fullMenu.length);
     const sampleMeal = STORE.fullMenu[index];
 
@@ -172,8 +179,9 @@ function displayRandomDish(){
 }
 
 function findMatchingResults(str){
+    // standardize user input and search full menu for any  occurances of the given input in each dish's name, category, area, tags, and ingredients
     $('#results').append(`
-        <h4>Showing results for "${str}":</h4>
+        <h4 id="subheader">Showing results for "${str}":</h4>
     `);
 
     const checkStr = str.toLowerCase().split(' ').join('');
@@ -187,22 +195,24 @@ function findMatchingResults(str){
         const checkDishTags = dish.strTags ? dish.strTags.toLowerCase().split(',').join('') : null;
 
         const dishIngredients = getIngredients(dish);
-        // console.log(dishIngredients);
 
         if (checkDishName.includes(checkStr) || checkDishName === checkStr){
             if(!matchingResults.includes(dish.idMeal)){
-                console.log('matching dish name found!')
                 matchingResults.push(dish.idMeal);
             }   
         } else if (checkDishCategory.includes(checkStr) || checkDishCategory === checkStr){
             if(!matchingResults.includes(dish.idMeal)){
-                console.log('matching category found!')
                 matchingResults.push(dish.idMeal);
             }
         } else if (checkDishArea.includes(checkStr) || checkDishArea === checkStr){
             if(!matchingResults.includes(dish.idMeal)){
-                console.log('matching area found!')
                 matchingResults.push(dish.idMeal);
+            }
+        } else if (checkDishTags){
+            if (checkDishTags.includes(checkStr) || checkDishTags === checkStr){
+                if(!matchingResults.includes(dish.idMeal)){
+                    matchingResults.push(dish.idMeal);
+                }
             }
         } else if (dishIngredients.length > 0){
             dishIngredients.map(ingredient =>{
@@ -213,21 +223,14 @@ function findMatchingResults(str){
                     }
                 }
             })
-            
-        } else if (checkDishTags){
-            if (checkDishTags.includes(checkStr)){
-                if(!matchingResults.includes(dish.idMeal)){
-                    matchingResults.push(dish.idMeal);
-                }
-            }
-        }
+        } 
     })
 
     displayMatchingResults(matchingResults);
 }
 
 function displayMatchingResults(arr){
-    
+    // iterate through list of IDs gathered to find dishes with matching IDs in the full menu, and display those dishes
     let relevantDishes = [];
 
     arr.map(id =>{
@@ -241,10 +244,10 @@ function displayMatchingResults(arr){
 }
 
 function loadDishes(dishes, count = 0){
-
+    // display results of searching the full menu for specific IDs
     if (dishes.length === 0){
         $('#results').append(`
-        <li id="unavailable">
+        <li>
             Sorry, we don't have any recipes for that search term. Please try again!
         </li>
         `);
@@ -269,22 +272,22 @@ function loadDishes(dishes, count = 0){
         `);
         })
     }
-    
 
     if (count === 0){
-        $('.dish').after(`
-        <li id="unavailable">
+        $('.dish').before(`
+        <li id="subheader">
             If you don't enter a specific search term, you'll get a random recipe!
         </li>
         `);
     }
-        
+    
     handleInstantSearch();
     handleVideoLoad();
     $('.hidden').removeClass();
 }
 
 function handleInstantSearch(){
+    // when clicking on a category,area, ingredient, or recent search term, use that specific text to automatically search
     $('.instant-search').click(function(){
         const searchVal = $(this).text();
 
@@ -294,11 +297,13 @@ function handleInstantSearch(){
 }
 
 function handleVideoLoad(){
+    // when view prep button is clicked, display a list of ingredients and related videos for that particular dish
     $('.view-btn').click(function() {
         $('#video-list').remove();
         $('#ingredient-sect').remove();
-        
+
         const dishToAddVids = $(this).closest('.dish');
+
         const dishID = $(dishToAddVids).attr('id');
 
         const thisDish = STORE.fullMenu.filter(function(obj){
@@ -306,9 +311,8 @@ function handleVideoLoad(){
         });
 
         const ingredients = getIngredients(thisDish);
-        console.log('ingredients = ');
-        console.log(ingredients);
 
+        // adds a mouse-over tooltip to provide hints on ingredients
         dishToAddVids.append(`
         <section id="ingredient-sect">
             <h4 class="tooltip">Common Ingredients:
@@ -317,7 +321,7 @@ function handleVideoLoad(){
             <ul id="ingredients-list"></ul>
         </section>
         `)
-
+        // populates all dish's ingredients
         ingredients.map(ingredient =>{
             $('#ingredients-list').append(`
                 <li class="instant-search">
@@ -327,7 +331,8 @@ function handleVideoLoad(){
         })
 
         handleInstantSearch();
-
+        
+        // adds a mouse-over tooltip to provide hints on videos
         dishToAddVids.append(`
             <section id="video-list">
                 <h4 class="tooltip">Related Videos:
@@ -340,32 +345,31 @@ function handleVideoLoad(){
 
         let videoTag = dishToAddVids.find('.dish-name').text();
         videoTag = videoTag.split(' ').join('+');
-        console.log(videoTag);
         
+        // search for specific video about 'how to make' the selected dish's name
         fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=How+to+Make+${videoTag}&maxResults=4&key=${STORE.yt_key}`)
         .then(response => response.json())
         .then(responseJSON => appendVideo(responseJSON));
-        
     })
-    function appendVideo(arr){
-        console.log(arr);
-        arr.items.map(video =>{
-            console.log(video)
-            console.log(video.id.videoId)
-            $(`#related-vids`).append(`
-            <li class="video">
-                <iframe 
-                    src="https://www.youtube.com/embed/${video.id.videoId}"
-                    frameborder="0"
-                    allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture">
-                </iframe>
-            </li>
-            `)
-        })
-    }
+}
+
+function appendVideo(arr){
+    // display video content
+    arr.items.map(video =>{
+        $(`#related-vids`).append(`
+        <li class="video">
+            <iframe 
+                src="https://www.youtube.com/embed/${video.id.videoId}"
+                frameborder="0"
+                allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture">
+            </iframe>
+        </li>
+        `)
+    })
 }
 
 function getIngredients(dish){
+    // iterate through all 20 possible indices of ingredients, and return list of ingredients in a given dish
     const dishIngredients = [];
 
     let i = 1;
@@ -373,7 +377,6 @@ function getIngredients(dish){
     while (i <= 20){
         if (dish[0]){
             const ingredient = dish[0]["strIngredient" + i];
-        // console.log(ingredient);
 
             if (ingredient === ""){
                 break;
@@ -384,29 +387,18 @@ function getIngredients(dish){
             }
         } else {
             const ingredient = dish["strIngredient" + i];
-        // console.log(ingredient);
 
-        if (ingredient === ""){
-            break;
-        } else if (ingredient == undefined){
-            break;
-        } else {
-            dishIngredients.push(ingredient);
+            if (ingredient === ""){
+                break;
+            } else if (ingredient == undefined){
+                break;
+            } else {
+                dishIngredients.push(ingredient);
+            }
         }
-        }
-        
-
         i++;
     }
     return dishIngredients;
-}
-
-function resChecker(){
-    if($(window).width() >= 840){
-        console.log('over 840');
-    } else {
-        console.log('under 840');
-    }
 }
 //----------------INITIALIZE--------------------
 $(getCooking);
