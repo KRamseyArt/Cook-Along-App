@@ -8,7 +8,6 @@
 }
 body {
     position: relative;
-    /* padding-bottom: 100px; */
     min-height: 100vh;
     max-width: 100vw;
     background: lightsalmon;
@@ -100,8 +99,6 @@ nav {
 }
 #non-search button{
     flex: 1;
-    /* width: 40%; */
-    /* margin: 5px 0; */
     background: tomato;
     border: none;
     border-radius: 50px;
@@ -137,6 +134,9 @@ nav {
     border-bottom: 2px solid forestgreen;
     background: white;
 }
+.dish:nth-child(even){
+    background: wheat;
+}
 .dish:nth-last-child(1){
     border-bottom: none;
 }
@@ -153,9 +153,7 @@ nav {
     max-height: 250px;
     /* background: wheat; */
 }
-#results .dish:nth-child(even){
-    background: wheat;
-}
+
 .dish-img{
     /* width: 25vw; */
     flex: 1;
@@ -190,12 +188,6 @@ nav {
 .dish-info button:hover{
     background: lightsalmon;
     cursor: pointer;
-}
-#categoryItems{
-    background: tomato;
-    padding: 10px;
-    border-radius: 20px;
-    width: 280px;
 }
 .instant-search{
     max-width: 250px;
@@ -235,20 +227,15 @@ nav {
     text-align: center;
     padding: 5px;
     border-radius: 6px;
-
-    /* Position the tooltip text */
     position: absolute;
     z-index: 1;
     top: 120%;
     left: 55%;
     margin-left: -50%;
-
-    /* Fade in tooltip */
     opacity: 0;
     transition: opacity 0.3s;
 }
 
-  /* Tooltip arrow */
 .tooltip .tooltiptext::before {
     content: "";
     position: absolute;
@@ -277,7 +264,6 @@ nav {
     width: 200px;
     flex: 1;
     white-space: nowrap;
-    /* overflow: hidden; */
 }
 
 #ingredients-list li:hover{
@@ -305,20 +291,6 @@ nav {
     /* max-width: 100px; */
     margin: 5px 0;
 }
-
-footer {
-    position: absolute;
-    bottom: 0;
-    background: forestgreen;
-    color: white;
-    width: 100vw;
-    padding: 10px 0;
-}
-.social-icon {
-    margin: 5px 5px 0 5px;
-    border-radius: 100%;
-}
-
 @media only screen and (min-width: 720px){    
     .dish{
         width: 520px;
