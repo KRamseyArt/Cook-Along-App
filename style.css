@@ -319,12 +319,12 @@ footer {
     border-radius: 100%;
 }
 
-@media only screen and (min-width: 840px){    
+@media only screen and (min-width: 720px){    
     .dish{
-        width: 720px;
+        width: 520px;
     }
     #searchForm fieldset {
-        width: 720px;
+        width: 520px;
     }
     #formHeader {
         background-image: linear-gradient(to left, wheat, forestgreen, forestgreen, forestgreen, forestgreen, wheat);
