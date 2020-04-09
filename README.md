@@ -9,4 +9,4 @@ HTML | CSS | JavaScript | jQuery | TheMealDB API | YouTube API
 - Displays an assortment of YouTube videos providing instructions on how to make the a given dish in various styles.
 
 ## Screenshot:
-https://drive.google.com/uc?id=1Pjq_SkBEB9CIPNjQvrSWuGjg5Sr_MdHf
+![Cook•Along App Screenshot](https://github.com/KRamseyArt/Cook-Along-App/blob/master/screenshot/CookAlongApp_Screenshots2TINY.jpg)
