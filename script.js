@@ -19,14 +19,24 @@ function getCooking(){
 function createMenu(){
     // Create Browse list by pulling all entries from APIs Area and Category lists
     fetch(`https://www.themealdb.com/api/json/v1/${STORE.meal_key}/list.php?c=list`)
-    .then(response => response.json())
+    .then(response => {
+        if(response.ok){
+            return response.json();
+        }
+        throw new Error(response.statusText);
+    })
     .then(responseJSON => {
         addToBrowseList(responseJSON);
         return fetch(`https://www.themealdb.com/api/json/v1/${STORE.meal_key}/list.php?a=list`);
     })
         
     // Add Areas to Browse List
-    .then(response => response.json())
+    .then(response => {
+        if(response.ok){
+            return response.json();
+        }
+        throw new Error(response.statusText);
+    })
     .then(responseJSON => {
         addToBrowseList(responseJSON);
     })
@@ -47,7 +57,12 @@ function searchForIDs(arr){
         // Returns objects with strMeal, strMealThumb, and idMeal properties
         if(filter.strArea){
             fetch(`https://www.themealdb.com/api/json/v1/${STORE.meal_key}/filter.php?a=${filter.strArea}`)
-            .then(response => response.json())
+            .then(response => {
+                if(response.ok){
+                    return response.json();
+                }
+                throw new Error(response.statusText);
+            })
             .then(responseJSON => queueMenu(responseJSON))
             .catch(error => displayError(error));
         }
@@ -57,7 +72,12 @@ function queueMenu(arr){
     // Search for complete dish data by idMeal value, and populate full menu with objects containing complete meal data
     const promises = arr.meals.map(meal =>{
         return fetch(`https://www.themealdb.com/api/json/v1/${STORE.meal_key}/lookup.php?i=${meal.idMeal}`)
-        .then(response => response.json())
+        .then(response => {
+            if(response.ok){
+                return response.json();
+            }
+            throw new Error(response.statusText);
+        })
         .then(responseJSON => addToMenu(responseJSON))
         .catch(error => displayError(error));
     })
@@ -348,7 +368,12 @@ function handleVideoLoad(){
         
         // search for specific video about 'how to make' the selected dish's name
         fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=How+to+Make+${videoTag}&maxResults=4&key=${STORE.yt_key}`)
-        .then(response => response.json())
+        .then(response => {
+            if(response.ok){
+                return response.json();
+            }
+            throw new Error(response.statusText);
+        })
         .then(responseJSON => appendVideo(responseJSON))
         .catch(error => displayError(error));
     })
@@ -403,8 +428,10 @@ function getIngredients(dish){
 
 function displayError(error){
     $('#results').empty().append(`
-        <li>${error.message}</li>
+        <li><h4 id="subheader">ERROR: ${error.message}</h4></li>
     `);
+
+    $('.hidden').removeClass();
 }
 //----------------INITIALIZE--------------------
 $(getCooking);
