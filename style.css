@@ -40,7 +40,7 @@ nav {
     font-size: 16px;
 }
 #hero{
-    background-image: url('https://www.themealdb.com/images/media/meals/uwxusv1487344500.jpg');
+    background-image: url('https://         www.themealdb.com/images/media/meals/uwxusv1487344500.jpg');
     height: 180px;
     width: 100%;
     background-size: cover;
@@ -174,11 +174,9 @@ nav {
 }
 .dish-tags li{
     font-size: 14px;
-    margin: 3px auto;
 }
 
 .view-btn, .hide-btn{
-    margin-top: 5px;
     padding: 10px;
     width: 150px;
     background: tomato;
@@ -190,9 +188,9 @@ nav {
     cursor: pointer;
 }
 .instant-search{
-    max-width: 250px;
+    min-width: 150px;
     color: black;
-    margin: 10px auto;
+    margin: 5px auto;
     white-space: nowrap;
     background: palegreen;
     border: 2px solid forestgreen;
@@ -209,66 +207,25 @@ nav {
     margin-left: 0;
 }
 
-
-.tooltip {
-    background: tomato;
-    color: wheat;
-    width: 100%;
-    position: relative;
-    display: inline-block;
-}
-
-.tooltip .tooltiptext {
-    visibility: hidden;
-    width: 90%;
-    background: lightsalmon;
-    color: black;
-    border: 2px solid tomato;
-    text-align: center;
-    padding: 5px;
-    border-radius: 6px;
-    position: absolute;
-    z-index: 1;
-    top: 120%;
-    left: 55%;
-    margin-left: -50%;
-    opacity: 0;
-    transition: opacity 0.3s;
-}
-
-.tooltip .tooltiptext::before {
-    content: "";
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    margin-left: -5px;
-    border-width: 5px;
-    border-style: solid;
-    border-color: transparent transparent lightsalmon transparent;
-}
-
-.tooltip:hover .tooltiptext {
-    visibility: visible;
-    opacity: 1;
-}
-
 #ingredients-list{
     padding: 0;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-evenly;
+    width: 90%;
 }
-#ingredients-list li{
+
+/*#ingredients-list li{
     margin: 2px 10px;
     background: palegreen;
     width: 200px;
     flex: 1;
     white-space: nowrap;
-}
+} 
 
 #ingredients-list li:hover{
     background: forestgreen;
-}
+}*/
 
 #video-list{
     background: tomato;
@@ -280,16 +237,17 @@ nav {
 #related-vids{
     padding: 0;
     width: 100%;
-    /* border: 2px solid black; */
     display: flex;
     flex-wrap: wrap;
-    /* justify-content: left; */
 }
 .video{
     list-style-type: none;
     flex: 1;
-    /* max-width: 100px; */
     margin: 5px 0;
+}
+.video iframe{
+    border: 2px solid wheat;
+    border-radius: 10px;
 }
 @media only screen and (min-width: 720px){    
     .dish{

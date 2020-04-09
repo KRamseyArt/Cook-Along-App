@@ -32,7 +32,7 @@ function createMenu(){
     })
 }
 function addToBrowseList(arr){
-    arr.meals.map(meal =>{
+    arr.meals.forEach(meal =>{
         // Browse list done
         STORE.browseList.push(meal);
     })
@@ -41,7 +41,7 @@ function addToBrowseList(arr){
 }
 function searchForIDs(arr){
     // iterate through browse list filtered for ONLY area, to return meal objects with ID values
-    arr.map(filter =>{
+    arr.forEach(filter =>{
         // filter Browse List for only Objects with Area categories, to ensure not to populate duplicate dish objects
         // Returns objects with strMeal, strMealThumb, and idMeal properties
         if(filter.strArea){
@@ -86,7 +86,7 @@ function manageSearch(){
 
         $('#results').empty();
 
-        let searchValue = e.target.foodName.value;
+        const searchValue = e.target.foodName.value;
 
         if (!searchValue){
             displayRandomDish();
@@ -116,7 +116,7 @@ function browseView(){
 
 function loadHeaderImage(){
     // Get image from a randomly selected dish object in the stored fullMenu array
-    let randomIndex = Math.floor(Math.random() * STORE.fullMenu.length);
+    const randomIndex = Math.floor(Math.random() * STORE.fullMenu.length);
     $('#hero').css('background-image',`url(${STORE.fullMenu[randomIndex].strMealThumb})`)
 }
 //----------------DISPLAY MANAGERS--------------------
@@ -133,15 +133,15 @@ function displayRecentList(){
 
     if (STORE.recentList.length === 0){
         $('#results').append(`
-            <h4 id="subheader">You have not made any recent search inquiries... Please enter a value into the search bar above, or select a category from our Browse menu!</h4>
+            <li><h4 id="subheader">You have not made any recent search inquiries... Please enter a value into the search bar above, or select a category from our Browse menu!</h4></li>
         `);
     } else {
         $('#results').append(`
-            <h4 id="subheader">Recent Searches:</h4>
+            <li><h4 id="subheader">Recent Searches:</h4></li>
         `);
-        STORE.recentList.map(entry =>{
+        STORE.recentList.forEach(entry =>{
             $('#results').append(`
-                <li class="instant-search">${entry}</li>
+                <li><button class="instant-search">${entry}</button></li>
             `)
         })
         handleInstantSearch();
@@ -153,16 +153,16 @@ function displayRecentList(){
 function displayBrowseList(){
     //Show user complete Browse List
     $('#results').empty().append(`
-        <h4 id="subheader">Browse Categories:</h4>
+        <li><h4 id="subheader">Browse Categories:</h4></li>
     `);
-    STORE.browseList.map(entry =>{
+    STORE.browseList.forEach(entry =>{
         if (entry.strArea){
             $('#results').append(`
-                <li class="instant-search area">${entry.strArea}</li>
+                <li><button class="instant-search">${entry.strArea}</button></li>
             `);
         } else if (entry.strCategory){
             $('#results').append(`
-                <li class="instant-search category">${entry.strCategory}</li>
+                <li><button class="instant-search">${entry.strCategory}</button></li>
             `);
         }
     })
@@ -181,14 +181,14 @@ function displayRandomDish(){
 function findMatchingResults(str){
     // standardize user input and search full menu for any  occurances of the given input in each dish's name, category, area, tags, and ingredients
     $('#results').append(`
-        <h4 id="subheader">Showing results for "${str}":</h4>
+        <li><h4 id="subheader">Showing results for "${str}":</h4></li>
     `);
 
     const checkStr = str.toLowerCase().split(' ').join('');
 
     const matchingResults = [];
 
-    STORE.fullMenu.map(dish =>{
+    STORE.fullMenu.forEach(dish =>{
         const checkDishName = dish.strMeal.toLowerCase().split(' ').join('');
         const checkDishCategory = dish.strCategory.toLowerCase().split(' ').join('');
         const checkDishArea = dish.strArea.toLowerCase().split(' ').join('');
@@ -215,10 +215,9 @@ function findMatchingResults(str){
                 }
             }
         } else if (dishIngredients.length > 0){
-            dishIngredients.map(ingredient =>{
+            dishIngredients.forEach(ingredient =>{
                 if(ingredient.toLowerCase().split(' ').join('').includes(dish.checkStr) || ingredient.toLowerCase().split(' ').join('') === checkStr){
                     if(!matchingResults.includes(dish.idMeal)){
-                        console.log('matching ingredient found!')
                         matchingResults.push(dish.idMeal);
                     }
                 }
@@ -231,9 +230,9 @@ function findMatchingResults(str){
 
 function displayMatchingResults(arr){
     // iterate through list of IDs gathered to find dishes with matching IDs in the full menu, and display those dishes
-    let relevantDishes = [];
+    const relevantDishes = [];
 
-    arr.map(id =>{
+    arr.forEach(id =>{
         const dishWithMatchingID = STORE.fullMenu.filter(function(obj){
             return obj.idMeal === id;
         })
@@ -252,21 +251,20 @@ function loadDishes(dishes, count = 0){
         </li>
         `);
     } else {
-        dishes.map(dish =>{
-            // console.log(dish[0]);
+        dishes.forEach(dish =>{
             $('#results').append(`
             <li class="dish" id="${dish[0].idMeal}">
                 <h3 class="dish-name">${dish[0].strMeal.toUpperCase()}</h3>
                 <section class="dish-info">
                     <img src="${dish[0].strMealThumb}" alt="Image of ${dish[0].strMeal}" class="dish-img"/>
-                    <section class="dish-links">
+                    <div class="dish-links">
                     <h4>Related Tags:</h4>
                         <ul class="dish-tags">
-                            <li class="instant-search category">${dish[0].strCategory}</li>
-                            <li class="instant-search area">${dish[0].strArea}</li>
+                            <li><button class="instant-search category">${dish[0].strCategory}</button></li>
+                            <li><button class="instant-search area">${dish[0].strArea}</button></li>
                         </ul>
                         <button class="view-btn">View Prep</button>
-                    </section>
+                    </div>
                 </section>
             </li>
         `);
@@ -289,6 +287,7 @@ function loadDishes(dishes, count = 0){
 function handleInstantSearch(){
     // when clicking on a category,area, ingredient, or recent search term, use that specific text to automatically search
     $('.instant-search').click(function(){
+        window.scrollTo(0,0);
         const searchVal = $(this).text();
 
         $('#foodName').val(searchVal);
@@ -315,17 +314,16 @@ function handleVideoLoad(){
         // adds a mouse-over tooltip to provide hints on ingredients
         dishToAddVids.append(`
         <section id="ingredient-sect">
-            <h4 class="tooltip">Common Ingredients:
-                <span class="tooltiptext">Each recipe is unique and may call for different ingredients, but these are a good starting point! Or click one to load a list of other dishes that use the same ingredient</span>
-            </h4>
+            <h4>Common Ingredients:</h4>
+            <p>Each recipe is unique and may call for different ingredients, but these are a good starting point! Or click one to load a list of other dishes that use the same ingredient</p>
             <ul id="ingredients-list"></ul>
         </section>
         `)
         // populates all dish's ingredients
-        ingredients.map(ingredient =>{
+        ingredients.forEach(ingredient =>{
             $('#ingredients-list').append(`
-                <li class="instant-search">
-                    ${ingredient}
+                <li>
+                    <button class="instant-search">${ingredient}</button>
                 </li>
             `)
         })
@@ -335,16 +333,14 @@ function handleVideoLoad(){
         // adds a mouse-over tooltip to provide hints on videos
         dishToAddVids.append(`
             <section id="video-list">
-                <h4 class="tooltip">Related Videos:
-                    <span class="tooltiptext">Each video will display slightly different recipe and instructions based on the chef's specifications</span>
-                </h4>
+                <h4>Related Videos:</h4>
+                <p>Each video will display a slightly different recipe and instructions based on the chef's specifications</p>
                 <ul id="related-vids">
                 </ul>
             </section>
         `)
 
-        let videoTag = dishToAddVids.find('.dish-name').text();
-        videoTag = videoTag.split(' ').join('+');
+        const videoTag = dishToAddVids.find('.dish-name').text().split(' ').join('+');
         
         // search for specific video about 'how to make' the selected dish's name
         fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=How+to+Make+${videoTag}&maxResults=4&key=${STORE.yt_key}`)
@@ -355,12 +351,11 @@ function handleVideoLoad(){
 
 function appendVideo(arr){
     // display video content
-    arr.items.map(video =>{
+    arr.items.forEach(video =>{
         $(`#related-vids`).append(`
         <li class="video">
             <iframe 
                 src="https://www.youtube.com/embed/${video.id.videoId}"
-                frameborder="0"
                 allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture">
             </iframe>
         </li>
