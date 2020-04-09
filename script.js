@@ -30,6 +30,7 @@ function createMenu(){
     .then(responseJSON => {
         addToBrowseList(responseJSON);
     })
+    .catch(error => displayError(error));
 }
 function addToBrowseList(arr){
     arr.meals.forEach(meal =>{
@@ -47,7 +48,8 @@ function searchForIDs(arr){
         if(filter.strArea){
             fetch(`https://www.themealdb.com/api/json/v1/${STORE.meal_key}/filter.php?a=${filter.strArea}`)
             .then(response => response.json())
-            .then(responseJSON => queueMenu(responseJSON));
+            .then(responseJSON => queueMenu(responseJSON))
+            .catch(error => displayError(error));
         }
     });
 }
@@ -57,6 +59,7 @@ function queueMenu(arr){
         return fetch(`https://www.themealdb.com/api/json/v1/${STORE.meal_key}/lookup.php?i=${meal.idMeal}`)
         .then(response => response.json())
         .then(responseJSON => addToMenu(responseJSON))
+        .catch(error => displayError(error));
     })
     Promise.all(promises).then(data => {
         // Once complete menu is populated, enable main interface functionality
@@ -216,7 +219,8 @@ function findMatchingResults(str){
             }
         } else if (dishIngredients.length > 0){
             dishIngredients.forEach(ingredient =>{
-                if(ingredient.toLowerCase().split(' ').join('').includes(dish.checkStr) || ingredient.toLowerCase().split(' ').join('') === checkStr){
+                const checkIngredient = ingredient.toLowerCase().split(' ').join('');
+                if(checkIngredient.includes(dish.checkStr) || checkIngredient === checkStr){
                     if(!matchingResults.includes(dish.idMeal)){
                         matchingResults.push(dish.idMeal);
                     }
@@ -345,7 +349,8 @@ function handleVideoLoad(){
         // search for specific video about 'how to make' the selected dish's name
         fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=How+to+Make+${videoTag}&maxResults=4&key=${STORE.yt_key}`)
         .then(response => response.json())
-        .then(responseJSON => appendVideo(responseJSON));
+        .then(responseJSON => appendVideo(responseJSON))
+        .catch(error => displayError(error));
     })
 }
 
@@ -394,6 +399,12 @@ function getIngredients(dish){
         i++;
     }
     return dishIngredients;
+}
+
+function displayError(error){
+    $('#results').empty().append(`
+        <li>${error.message}</li>
+    `);
 }
 //----------------INITIALIZE--------------------
 $(getCooking);
