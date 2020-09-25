@@ -1,5 +1,5 @@
 # Cook•Along App
-https://kramseyart.github.io/Cook-Along-App/
+https://kalinramsey.github.io/Cook-Along-App/
 
 ## Technologies Used
 HTML | CSS | JavaScript | jQuery | TheMealDB API | YouTube API
